@@ -8,7 +8,7 @@ if "GOOGLE_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 
 # MODEL İSMİ BURADA: En sorunsuz ismi yazdım
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 prompt = st.text_input("Sorunuzu yazın:")
 
