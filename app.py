@@ -1,25 +1,32 @@
 import streamlit as st
-from duckduckgo_search import DDGS # Anahtarsız arama için
+from duckduckgo_search import DDGS
 
+st.set_page_config(page_title="Futbol AI", page_icon="⚽")
 st.title("⚽ Efsane Futbol Ansiklopedisi")
 
 def futbol_bilgisi_getir(soru):
-    # Botun futbol dışına çıkmasını engellemek için arama sorgusunu daraltıyoruz
-    arama_sorgusu = f"{soru} futbolcu kariyeri istatistikleri"
     with DDGS() as ddgs:
-        # Web'den en güncel futbol bilgilerini çekiyoruz
-        search_results = [r['body'] for r in ddgs.text(arama_sorgusu, max_results=3)]
-        context = "\n".join(search_results)
+        # Önce web araması yapıp bilgi topluyoruz
+        arama_sonucu = ddgs.text(f"{soru} futbol kariyeri", max_results=3)
+        bilgi_metni = " ".join([r['body'] for r in arama_sonucu])
         
-        # Yapay zekaya bu bilgileri verip Türkçe yorumlatıyoruz
-        talimat = f"Sen bir futbol uzmanısın. Şu bilgilere dayanarak sadece Türkçe ve futbol odaklı cevap ver: {context}. Soru: {soru}"
-        answer = ddgs.chat(talimat, model='gpt-4o-mini')
-        return answer
+        # Yapay zekaya bu bilgiyi verip Türkçe yorumlatıyoruz
+        # Yeni sürümde model ismini belirtmeden sadece chat(mesaj) kullanıyoruz
+        komut = f"Sen sadece Türkçe konuşan bir futbol uzmanısın. Şu bilgilere dayanarak cevap ver: {bilgi_metni}. Soru: {soru}"
+        
+        # En güncel chat komutu budur:
+        try:
+            cevap = ddgs.chat(komut)
+            return cevap
+        except:
+            # Eğer chat özelliği o an çalışmazsa direkt arama özetini veriyoruz
+            return "Aradığın bilgiyi buldum: " + bilgi_metni[:500] + "..."
 
-if prompt := st.chat_input("Hangi futbolcuyu veya takımı merak ediyorsun?"):
+if prompt := st.chat_input("Hangi futbolcuyu merak ediyorsun?"):
     with st.chat_message("user"):
         st.markdown(prompt)
     
     with st.chat_message("assistant"):
-        cevap = futbol_bilgisi_getir(prompt)
-        st.markdown(cevap)
+        with st.spinner("Futbol arşivine bakıyorum..."):
+            cevap = futbol_bilgisi_getir(prompt)
+            st.markdown(cevap)
