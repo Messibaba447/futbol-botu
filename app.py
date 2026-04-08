@@ -1,20 +1,12 @@
-import streamlit as st
-import google.generativeai as genai
-
-st.title("⚽ Futbol Botu")
-
-# Ayarlardaki kutudan anahtarı alır
-if "GOOGLE_API_KEY" in st.secrets:
-    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-
-# MODEL İSMİ BURADA: En sorunsuz ismi yazdım
-model = genai.GenerativeModel('gemini-1.5-flash')
-
-prompt = st.text_input("Sorunuzu yazın:")
-
-if prompt:
+# Kullanılabilir modelleri listele ve uygun olanı seç
+try:
+    # Önce en yeniyi dene
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Test et
+    model.generate_content("test")
+except:
     try:
-        response = model.generate_content(prompt)
-        st.write(response.text)
-    except Exception as e:
-        st.error(f"Hata çıktı: {e}")
+        # Olmazsa bir öncekini dene
+        model = genai.GenerativeModel('gemini-pro')
+    except:
+        st.error("Maalesef API anahtarınız şu anki modellere erişemiyor.")
