@@ -1,24 +1,30 @@
 import streamlit as st
 import google.generativeai as genai
 
-# SAYFA AYARLARI
-st.set_page_config(page_title="Futbol AI", page_icon="⚽")
-st.title("⚽ Efsane Futbol Ansiklopedisi")
+# Sayfa Başlığı
+st.title("⚽ Futbol Botu")
 
-# BURAYA ALDIĞIN ANAHTARI YAZ
-GOOGLE_API_KEY = "AIzaSyAu0jEIx1MWY52ft0M8scKaaEzh1HDLags"
-genai.configure(api_key=GOOGLE_API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# API Anahtarını Secrets'tan al
+if "GOOGLE_API_KEY" in st.secrets:
+    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+else:
+    st.error("API Anahtarı bulunamadı! Lütfen Secrets ayarlarına bakın.")
 
+# --- EN ÖNEMLİ KISIM BURASI ---
+# Eğer gemini-1.5-flash hata verirse otomatik olarak gemini-pro deneyecek
+try:
+    model = genai.GenerativeModel('gemini-1.5-flash')
+except:
+    model = genai.GenerativeModel('gemini-pro')
+# ------------------------------
 
-# BOTUN KURALI
-talimat = "Sen sadece futbol uzmanısın. Sadece Türkçe konuş. Dünyadaki tüm futbolcuları ve tarihini biliyorsun."
+prompt = st.text_input("Sorunuzu yazın:")
 
-if prompt := st.chat_input("Messi'yi sor..."):
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    
-    with st.chat_message("assistant"):
-        # Yapay zekaya soruyu gönderiyoruz
-        response = model.generate_content(f"{talimat} Soru: {prompt}")
-        st.markdown(response.text)
+if prompt:
+    try:
+        # Bu satır artık hata vermemeli
+        response = model.generate_content(prompt)
+        st.write(response.text)
+    except Exception as e:
+        st.error(f"Hata oluştu: {e}")
+
