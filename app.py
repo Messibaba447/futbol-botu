@@ -6,27 +6,24 @@ st.title("⚽ Efsane Futbol Ansiklopedisi")
 
 def futbol_bilgisi_getir(soru):
     with DDGS() as ddgs:
-        # Önce web araması yapıp bilgi topluyoruz
-        arama_sonucu = ddgs.text(f"{soru} futbol kariyeri", max_results=3)
+        # Web araması yapıp bilgi topluyoruz
+        arama_sonucu = ddgs.text(f"{soru} futbol bilgisi", max_results=3)
         bilgi_metni = " ".join([r['body'] for r in arama_sonucu])
         
-        # Yapay zekaya bu bilgiyi verip Türkçe yorumlatıyoruz
-        # Yeni sürümde model ismini belirtmeden sadece chat(mesaj) kullanıyoruz
-        komut = f"Sen sadece Türkçe konuşan bir futbol uzmanısın. Şu bilgilere dayanarak cevap ver: {bilgi_metni}. Soru: {soru}"
+        # Kesin talimat: Türkçe konuş!
+        komut = f"SEN SADECE TÜRKÇE KONUŞAN BİR FUTBOL UZMANISIN. ASLA İNGİLİZCE CEVAP VERME. Soru: {soru}. Bilgi: {bilgi_metni}"
         
-        # En güncel chat komutu budur:
         try:
             cevap = ddgs.chat(komut)
             return cevap
         except:
-            # Eğer chat özelliği o an çalışmazsa direkt arama özetini veriyoruz
-            return "Aradığın bilgiyi buldum: " + bilgi_metni[:500] + "..."
+            return "Üzgünüm, şu an futbol arşivine ulaşamadım. Lütfen tekrar sor."
 
 if prompt := st.chat_input("Hangi futbolcuyu merak ediyorsun?"):
     with st.chat_message("user"):
         st.markdown(prompt)
     
     with st.chat_message("assistant"):
-        with st.spinner("Futbol arşivine bakıyorum..."):
+        with st.spinner("Futbol arşivini Türkçe olarak tarıyorum..."):
             cevap = futbol_bilgisi_getir(prompt)
             st.markdown(cevap)
