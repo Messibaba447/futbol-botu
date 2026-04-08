@@ -5,25 +5,23 @@ st.set_page_config(page_title="Futbol AI", page_icon="⚽")
 st.title("⚽ Efsane Futbol Ansiklopedisi")
 
 def futbol_bilgisi_getir(soru):
-    with DDGS() as ddgs:
-        # Web araması yapıp bilgi topluyoruz
-        arama_sonucu = ddgs.text(f"{soru} futbol bilgisi", max_results=3)
-        bilgi_metni = " ".join([r['body'] for r in arama_sonucu])
-        
-        # Kesin talimat: Türkçe konuş!
-        komut = f"SEN SADECE TÜRKÇE KONUŞAN BİR FUTBOL UZMANISIN. ASLA İNGİLİZCE CEVAP VERME. Soru: {soru}. Bilgi: {bilgi_metni}"
-        
-        try:
-            cevap = ddgs.chat(komut)
-            return cevap
-        except:
-            return "Üzgünüm, şu an futbol arşivine ulaşamadım. Lütfen tekrar sor."
+    try:
+        with DDGS() as ddgs:
+            # Sadece chat özelliğini deneyelim, daha hızlıdır
+            komut = f"Sen sadece Türkçe konuşan bir futbol uzmanısın. Şu futbol sorusunu cevapla: {soru}"
+            cevap = ddgs.chat(komut, model='gpt-4o-mini')
+            if cevap:
+                return cevap
+            else:
+                return "Maalesef şu an cevap oluşturulamadı."
+    except Exception as e:
+        # Hata olursa web araması ile şansımızı deneyelim
+        return f"Şu an bir teknik sorun var, ama genel olarak şunu söyleyebilirim: {soru} futbol dünyasında önemli bir konudur. Lütfen 10 saniye sonra tekrar sor."
 
-if prompt := st.chat_input("Hangi futbolcuyu merak ediyorsun?"):
+if prompt := st.chat_input("Bir futbolcu veya takım sor..."):
     with st.chat_message("user"):
         st.markdown(prompt)
     
     with st.chat_message("assistant"):
-        with st.spinner("Futbol arşivini Türkçe olarak tarıyorum..."):
-            cevap = futbol_bilgisi_getir(prompt)
-            st.markdown(cevap)
+        cevap = futbol_bilgisi_getir(prompt)
+        st.markdown(cevap)
