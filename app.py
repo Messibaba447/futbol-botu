@@ -10,6 +10,7 @@ GOOGLE_API_KEY = "AIzaSyAu0jEIx1MWY52ft0M8scKaaEzh1HDLags"
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
+
 # BOTUN KURALI
 talimat = "Sen sadece futbol uzmanısın. Sadece Türkçe konuş. Dünyadaki tüm futbolcuları ve tarihini biliyorsun."
 
