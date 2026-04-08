@@ -13,7 +13,8 @@ else:
 
 # 2. En Garantili Modeli Tanımla
 # Hata almamak için doğrudan ismi yazıyoruz
-model = genai.GenerativeModel('models/gemini-1.0-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
+
 
 # 3. Kullanıcı Girişi
 soru = st.text_input("Sorunuzu buraya yazın:")
